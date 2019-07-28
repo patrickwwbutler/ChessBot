@@ -39,7 +39,6 @@ def handleInput():
 if __name__ == '__main__':
     board = Board()
     board.initialize()
-    board.display()
     while True:
         board.display()
         goodmove = False
