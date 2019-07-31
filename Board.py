@@ -1,7 +1,21 @@
 from Pieces import *
+from copy import deepcopy
 
 def inBounds(x):
     return x >= 0 and x < 8
+
+def otherSide(side):
+    if side == 'w':
+        return 'b'
+    else:
+        return 'w'
+
+def getCoeff(side):
+    if side == 'w':
+        return -1
+    else:
+        return 1
+
 
 class Board(object):
     def __init__(self):
@@ -10,6 +24,9 @@ class Board(object):
         self.pieces = {}
         self.pieces['w'] = []
         self.pieces['b'] = []
+        self.inCheck = {}
+        self.inCheck['w'] = False
+        self.inCheck['b'] = False
         for i in range(0, 8):
             self.board.append(list(row))
 
@@ -17,12 +34,12 @@ class Board(object):
     def checkPos(self, r, c):
         return self.board[r][c]
 
+
     def display(self):
-        print('  ---------------------------------')
+        print('   ---------------------------------')
         i = 0
-        rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
         for row in self.board:
-            print(rows[i], end="  ")
+            print(8 - i, end="  ")
             i += 1
             print('| ', end='')
             for piece in row:
@@ -31,12 +48,13 @@ class Board(object):
                 else:
                     print(' ', end=' | ')
             print('')
-            print('  ---------------------------------')
-        print('    1   2   3   4   5   6   7   8')
+            print('   ---------------------------------')
+        print('     A   B   C   D   E   F   G   H')
         print()
 
     def placeAt(self, piece, r, c):
         self.board[r][c] = piece
+
 
     def initialize(self):
         for i in range(0, 8):
@@ -84,16 +102,18 @@ class Board(object):
             self.pieces[s].append(b2)
             self.board[r][5] = b2
 
+
     def isLegalMove(self, move, side):
         start = self.board[move[0][0]][move[0][1]]
         if not inBounds(move[1][0]) or not inBounds(move[1][1]):
-            print("Move not inbounds")
             return False
         if start == None:
-            print("No piece at start square")
             return False
         if start.side != side:
-            print("Piece at starting square is not yours")
+            return False
+        netmove = ((move[1][0] - move[0][0]), (move[1][1] - move[0][1]))
+        end = self.board[move[1][0]][move[1][1]]
+        if end != None and end.side == side:
             return False
         legalmoves = list(start.getMoves())
         if start.type == 'P':
@@ -105,16 +125,44 @@ class Board(object):
             if start.r + coeff < 8 and start.r + coeff >= 0:
                 if start.c + 1 < 8:
                     diag1 = self.board[start.r+coeff][start.c+1]
-                    if diag1 != None and diag1.side != start.side:
-                        legalmoves.append((coeff, 1))
+                    if diag1 == None or diag1.side == start.side:
+                        legalmoves.remove((coeff, 1))
                 if start.c - 1 >= 0:
                     diag2 = self.board[start.r+coeff][start.c-1]
-                    if diag2 != None and diag2.side != start.side:
-                        legalmoves.append((coeff, -1))
+                    if diag2 == None or diag2.side == start.side:
+                        legalmoves.remove((coeff, -1))
+            if self.board[move[1][0]][move[1][1]] != None and move[1][1] - move[1][0] != 0:
+                return False
 
             if start.hasMoved == False:
                 legalmoves.append((2*coeff, 0))
-        netmove = ((move[1][0] - move[0][0]), (move[1][1] - move[0][1]))
+        if netmove not in legalmoves:
+            return False
+
+        if start.type == 'R' or start.type == 'B' or start.type == 'Q':
+            row_diff = move[1][0] - move[0][0]
+            col_diff = move[1][1] - move[0][1]
+            row_coeff = 0
+            if row_diff > 0:
+                row_coeff = 1
+            elif row_diff < 0:
+                row_coeff = -1
+            col_coeff = 0
+            if col_diff > 0:
+                col_coeff = 1
+            elif col_diff < 0:
+                col_coeff = -1
+            for i in range(1, max(abs(row_diff), abs(col_diff))):
+                if self.board[move[0][0]+i*row_coeff][move[0][1]+i*col_coeff] != None:
+                    return False
+
+
+        validmove = netmove in legalmoves
+        if not validmove:
+            return False
+        if self.inCheck[side]:
+            if self.generateSuccessor(move).isInCheck(side):
+                return False
         return netmove in legalmoves
 
 
@@ -127,7 +175,7 @@ class Board(object):
 
         if piece.type == 'P':
             piece.hasMoved = True
-            if (move[1][1] == 0 and piece.side == 'w') or (move[1][1] == 7 and piece.side == 'b'):
+            if (move[1][0] == 0 and piece.side == 'w') or (move[1][0] == 7 and piece.side == 'b'):
                 print("""Choose a piece to promote your pawn to:
                     1. Knight
                     2. Bishop
@@ -150,4 +198,37 @@ class Board(object):
                 if selection_int == 4:
                     self.board[move[1][0]][move[1][1]] = Queen(piece.r, piece.c, piece.side)
 
-        def isInCheck()
+
+    def isInCheck(self, side):
+        king = None
+        for piece in self.pieces[side]:
+            if piece.type == 'K':
+                king = piece
+        king_coords = (king.r, king.c)
+
+        for piece in self.pieces[otherSide(side)]:
+            piece_coords = (piece.r, piece.c)
+            if self.isLegalMove((piece_coords, king_coords), piece.side):
+                return True
+        return False
+
+
+    def checkmate(self, side):
+        # if this is called, we can assume the king is at least in check
+        for piece in self.pieces[side]:
+            moves = list(piece.moves)
+            if piece.type == 'P' and not piece.hasMoved:
+                moves.append((getCoeff(side)*2, 0))
+            for move in moves:
+                move_alt = ((piece.r, piece.c), (piece.r + move[0], piece.c + move[1]))
+                if self.isLegalMove(move_alt, side):
+                    if not self.generateSuccessor(move_alt).isInCheck(side):
+                        print('move ', move_alt, ' can escape check')
+                        return False
+        return True
+
+
+    def generateSuccessor(self, move):
+        new_board = deepcopy(self)
+        new_board.enterMove(move)
+        return new_board

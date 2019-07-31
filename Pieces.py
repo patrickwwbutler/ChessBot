@@ -29,7 +29,7 @@ class Pawn(Piece):
             coeff = 1
         else:
             coeff = -1
-        self.moves = [(coeff, 0)]
+        self.moves = [(coeff, 0), (coeff, 1), (coeff, -1)]
         self.value = 1
         self.type = 'P'
         self.hasMoved = False
@@ -41,6 +41,7 @@ class Rook(Piece):
         self.side = side
         self.type = 'R'
         self.moves = [(0, i) for i in range(-7, 8)] + [(i, 0) for i in range(-7, 8)]
+        self.moves.remove((0, 0))
         self.value = 5
 
 class Knight(Piece):
@@ -59,6 +60,7 @@ class Bishop(Piece):
         self.side = side
         self.value = 3
         self.moves = [(i, i) for i in range(-7, 8)] + [(i, -i) for i in range(-7, 8)]
+        self.moves.remove((0, 0))
         self.type = 'B'
 
 class Queen(Piece):
@@ -68,6 +70,7 @@ class Queen(Piece):
         self.side = side
         self.value = 9
         self.moves = [(i, i) for i in range(-7, 8)] + [(i, -i) for i in range(-7, 8)] + [(0, i) for i in range(-7, 8)] + [(i, 0) for i in range(-7, 8)]
+        self.moves.remove((0, 0))
         self.type = 'Q'
 
 class King(Piece):
