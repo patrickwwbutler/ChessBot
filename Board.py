@@ -113,7 +113,7 @@ class Board(object):
             return False
         netmove = ((move[1][0] - move[0][0]), (move[1][1] - move[0][1]))
         end = self.board[move[1][0]][move[1][1]]
-        if end != None and end.side == side:
+        if end != None and (end.side == side or end.type == 'K'):
             return False
         legalmoves = list(start.getMoves())
         if start.type == 'P':
@@ -160,10 +160,9 @@ class Board(object):
         validmove = netmove in legalmoves
         if not validmove:
             return False
-        if self.inCheck[side]:
-            if self.generateSuccessor(move).isInCheck(side):
-                return False
-        return netmove in legalmoves
+        if self.generateSuccessor(move).isInCheck(side):
+            return False
+        return True
 
 
     def enterMove(self, move):
@@ -237,5 +236,16 @@ class Board(object):
         new_board.enterMove(move)
         return new_board
 
+
     def getPiecesFromSide(self, side):
         return self.pieces[side]
+
+
+    def getMovesForSide(self, side):
+        moves = []
+        for piece in self.pieces[side]:
+            for move in piece.moves:
+                move_tuple = ((piece.r, piece.c), (piece.r + move[0], piece.c + move[1]))
+                if self.isLegalMove(move_tuple, side):
+                    moves.append(move_tuple)
+        return moves
