@@ -1,4 +1,5 @@
 from Board import Board
+from heuristics import *
 
 # TO DO
 # Check that no pieces are in the way of multiple square moves for rook, bishop, queen
@@ -43,6 +44,7 @@ def handleInput():
 if __name__ == '__main__':
     board = Board()
     board.initialize()
+    heuristic = NaiveHeuristic()
     while True:
         board.display()
         goodmove = False
@@ -60,6 +62,7 @@ if __name__ == '__main__':
                 print('Checkmate! White wins')
                 break
         board.display()
+        print('Score: ', heuristic.evaluate(board, 'w'))
         goodmove = False
         move = None
         while not goodmove:

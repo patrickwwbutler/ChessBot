@@ -131,10 +131,10 @@ class Board(object):
                     diag2 = self.board[start.r+coeff][start.c-1]
                     if diag2 == None or diag2.side == start.side:
                         legalmoves.remove((coeff, -1))
-            if self.board[move[1][0]][move[1][1]] != None and move[1][1] - move[1][0] != 0:
+            if self.board[move[1][0]][move[1][1]] != None and move[1][1] - move[0][1] == 0:
                 return False
 
-            if start.hasMoved == False:
+            if start.hasMoved == False and self.board[move[0][0]+coeff][move[0][1]] == None:
                 legalmoves.append((2*coeff, 0))
         if netmove not in legalmoves:
             return False
@@ -168,6 +168,10 @@ class Board(object):
 
     def enterMove(self, move):
         piece = self.board[move[0][0]][move[0][1]]
+        target = self.board[move[1][0]][move[1][1]]
+        if target != None:
+            start_side = piece.side
+            self.pieces[otherSide(start_side)].remove(target)
         self.board[move[1][0]][move[1][1]] = piece
         piece.r = move[1][0]
         piece.c = move[1][1]
@@ -232,3 +236,6 @@ class Board(object):
         new_board = deepcopy(self)
         new_board.enterMove(move)
         return new_board
+
+    def getPiecesFromSide(self, side):
+        return self.pieces[side]

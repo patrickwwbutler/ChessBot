@@ -78,6 +78,6 @@ class King(Piece):
         self.r = r
         self.c = c
         self.side = side
-        self.value = float('inf')
+        self.value = 100
         self.moves = [(0, 1), (1, 1), (-1, 1), (1, 0), (-1, 0), (-1, -1), (0, -1), (1, -1)]
         self.type = 'K'
