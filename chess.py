@@ -1,60 +1,15 @@
 from Board import Board
-from heuristics import *
+from Heuristics import *
+from Agents import *
 
-# TO DO
-# Check that no pieces are in the way of multiple square moves for rook, bishop, queen
-# Ensure checkmate works properly
-
-
-letters = {'A':0, 'B':1, 'C':2, 'D':3, 'E':4, 'F':5, 'G':6, 'H':7}
-
-def handleInput():
-    command = input()
-    coords = command.split(' ')
-    if len(coords) != 2:
-        print('Error: invalid command')
-        return None
-    startcol = coords[0][0]
-    if not startcol.isalpha():
-        print('Error: invalid command')
-        return None
-    col1 = letters[startcol.upper()]
-    startrow = coords[0][1]
-    if not startrow.isdigit():
-        print('Error: invalid command')
-        return None
-    row1 = int(startrow)
-    row1 = 8 - row1
-    start = (row1, col1)
-    endcol = coords[1][0]
-    if not endcol.isalpha():
-        print('Error: invalid command')
-        return None
-    col2 = letters[endcol.upper()]
-    endrow = coords[1][1]
-    if not endrow.isdigit():
-        print('Error: invalid command')
-        return None
-    row2 = int(endrow)
-    row2 = 8 - row2
-    end = (row2, col2)
-    return (start, end)
+depth = 2
 
 
-if __name__ == '__main__':
-    board = Board()
-    board.initialize()
-    heuristic = NaiveHeuristic()
+
+def gameLoop(board, white_agent, black_agent):
     while True:
         board.display()
-        goodmove = False
-        move = None
-        while not goodmove:
-            move = handleInput()
-            if move != None:
-                goodmove = board.isLegalMove(move, 'w')
-                if not goodmove:
-                    print("Error: invalid move")
+        move = white_agent.chooseMove(board, 'w')
         board.enterMove(move)
         if board.isInCheck('b'):
             print('Black is in check!')
@@ -62,16 +17,48 @@ if __name__ == '__main__':
                 print('Checkmate! White wins')
                 break
         board.display()
-        print('Score: ', heuristic.evaluate(board, 'w'))
-        goodmove = False
-        move = None
-        while not goodmove:
-            move = handleInput()
-            if move != None:
-                goodmove = board.isLegalMove(move, 'b')
+        move = black_agent.chooseMove(board, 'b')
         board.enterMove(move)
         if board.isInCheck('w'):
             print('White is in check!')
             if board.checkmate('w'):
                 print('Checkmate! Black wins')
                 break
+
+
+if __name__ == '__main__':
+    board = Board()
+    board.initialize()
+    white_agent = None
+    black_agent = None
+    bad_choice = True
+    choice_str = ''
+    while bad_choice:
+        print("""Choose player for white:
+            1. Human
+            2. MinimaxAgent""")
+        choice_str = input()
+        if choice_str.isdigit() and int(choice_str) > 0 and int(choice_str) < 3:
+            bad_choice = False
+    choice = int(choice_str)
+    if choice == 1:
+        white_agent = PlayerAgent('w')
+    if choice == 2:
+        white_agent = MinimaxAgent(depth, 'w')
+
+    bad_choice = True
+    choice_str = ''
+    while bad_choice:
+        print("""Choose player for black:
+            1. Human
+            2. MinimaxAgent""")
+        choice_str = input()
+        if choice_str.isdigit() and int(choice_str) > 0 and int(choice_str) < 3:
+            bad_choice = False
+    choice = int(choice_str)
+    if choice == 1:
+        black_agent = PlayerAgent('b')
+    if choice == 2:
+        black_agent = MinimaxAgent(depth, 'b')
+
+    gameLoop(board, white_agent, black_agent)

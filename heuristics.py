@@ -5,9 +5,16 @@ class Heuristic(object):
 
 
 class NaiveHeuristic(Heuristic):
+    def __init__(self):
+        print('Using naive heuristic')
+
     def evaluate(self, board, side):
-        friendlies = board.getPiecesFromSide(side)
         score = 0
+        if board.isInCheck(otherSide(side)):
+            score += 10
+            if board.checkmate(otherSide(side)):
+                score += 1000
+        friendlies = board.getPiecesFromSide(side)
         for piece in friendlies:
             score += piece.value
         enemies = board.getPiecesFromSide(otherSide(side))
