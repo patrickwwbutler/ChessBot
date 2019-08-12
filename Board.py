@@ -24,9 +24,9 @@ class Board(object):
         self.pieces = {}
         self.pieces['w'] = []
         self.pieces['b'] = []
-        self.inCheck = {}
-        self.inCheck['w'] = False
-        self.inCheck['b'] = False
+        self.in_check = {}
+        self.in_check['w'] = False
+        self.in_check['b'] = False
         for i in range(0, 8):
             self.board.append(list(row))
 
@@ -202,6 +202,23 @@ class Board(object):
                     self.board[move[1][0]][move[1][1]] = Queen(piece.r, piece.c, piece.side)
 
 
+    def enterMoveAuto(self, move):
+        piece = self.board[move[0][0]][move[0][1]]
+        target = self.board[move[1][0]][move[1][1]]
+        if target != None:
+            start_side = piece.side
+            self.pieces[otherSide(start_side)].remove(target)
+        self.board[move[1][0]][move[1][1]] = piece
+        piece.r = move[1][0]
+        piece.c = move[1][1]
+        self.board[move[0][0]][move[0][1]] = None
+
+        if piece.type == 'P':
+            piece.hasMoved = True
+            if (move[1][0] == 0 and piece.side == 'w') or (move[1][0] == 7 and piece.side == 'b'):
+                self.board[move[1][0]][move[1][1]] = Queen(piece.r, piece.c, piece.side)
+
+
     def isInCheck(self, side):
         king = None
         for piece in self.pieces[side]:
@@ -233,7 +250,7 @@ class Board(object):
 
     def generateSuccessor(self, move):
         new_board = deepcopy(self)
-        new_board.enterMove(move)
+        new_board.enterMoveAuto(move)
         return new_board
 
 

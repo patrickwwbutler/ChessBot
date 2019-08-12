@@ -4,15 +4,19 @@ from Heuristics import *
 class Agent(object):
     def __init__(self):
         self.heuristic = heuristic
+
     def chooseMove(self, board, side):
         raise NotImplementedError
+
     def setHeuristic(self):
         raise NotImplementedError
+
 
 class PlayerAgent(Agent):
     def __init__(self, side):
         self.side = side
         self.letters = {'A':0, 'B':1, 'C':2, 'D':3, 'E':4, 'F':5, 'G':6, 'H':7}
+
     def chooseMove(self, board, side):
         goodmove = False
         move = None
@@ -22,7 +26,7 @@ class PlayerAgent(Agent):
                 goodmove = board.isLegalMove(move, self.side)
                 if not goodmove:
                     print("Error: invalid move")
-        return move
+        board.enterMove(move)
 
     def handleInput(self):
         command = input()
@@ -62,6 +66,7 @@ class MinimaxAgent(Agent):
         self.heuristic = NaiveHeuristic()
         self.depth = depth
         self.side = side
+
     def chooseMove(self, board, side):
         moves = board.getMovesForSide(side)
         best_score = -float('inf')
@@ -71,7 +76,8 @@ class MinimaxAgent(Agent):
             if score > best_score:
                 best_score = score
                 best_move = move
-        return best_move
+        board.enterMoveAuto(best_move)
+
 
     def evalMin(self, board, side, depth):
         if depth == self.depth:
@@ -84,3 +90,14 @@ class MinimaxAgent(Agent):
             return self.heuristic.evaluate(board, self.side)
         moves = board.getMovesForSide(side)
         return max([self.evalMin(board.generateSuccessor(move), otherSide(side), depth + 1) for move in moves])
+
+
+# class AlphaBetaPruningAgent(Agent):
+#     def __init__(self, depth, side):
+#         self.heuristic = NaiveHeuristic()
+#         self.depth = depth
+#         self.side = side
+#
+#     def chooseMove(self, board):
+#         moves = board.getMovesForSide(self.side)
+#         alpha
