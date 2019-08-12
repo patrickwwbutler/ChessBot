@@ -62,10 +62,19 @@ class PlayerAgent(Agent):
 
 
 class MinimaxAgent(Agent):
-    def __init__(self, depth, side):
+    def __init__(self, side):
         self.heuristic = NaiveHeuristic()
-        self.depth = depth
         self.side = side
+        print("""Please enter a search depth for the minimax agent.
+        Depths over 4 will be extremely slow, and it is recommended you use the AlphaBetaPruningAgent for more depth.""")
+        bad_input = True
+        while bad_input:
+            depth_str = input()
+            if depth_str.isdigit() and int(depth_str) > 0:
+                self.depth = int(depth_str)
+                bad_input = False
+            else:
+                print("Invalid depth")
 
     def chooseMove(self, board, side):
         moves = board.getMovesForSide(side)

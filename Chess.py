@@ -2,9 +2,6 @@ import Board
 from Heuristics import *
 from Agents import *
 
-depth = 3
-
-
 
 def gameLoop(board, white_agent, black_agent):
     while True:
@@ -25,7 +22,7 @@ def gameLoop(board, white_agent, black_agent):
 
 
 if __name__ == '__main__':
-    board = Board.Board()
+    board = Board()
     board.initialize()
     white_agent = None
     black_agent = None
@@ -57,6 +54,6 @@ if __name__ == '__main__':
     if choice == 1:
         black_agent = PlayerAgent('b')
     if choice == 2:
-        black_agent = MinimaxAgent(depth, 'b')
+        black_agent = MinimaxAgent('b')
 
     gameLoop(board, white_agent, black_agent)
