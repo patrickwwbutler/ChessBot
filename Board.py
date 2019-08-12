@@ -193,13 +193,25 @@ class Board(object):
                         if selection_int >= 1 and selection_int <= 4:
                             bad_input = False
                 if selection_int == 1:
-                    self.board[move[1][0]][move[1][1]] = Knight(piece.r, piece.c, piece.side)
+                    new_piece = Knight(piece.r, piece.c, piece.side)
+                    self.board[move[1][0]][move[1][1]] = new_piece
+                    self.pieces[piece.side].remove(piece)
+                    self.pieces[piece.side].append(new_piece)
                 if selection_int == 2:
-                    self.board[move[1][0]][move[1][1]] = Bishop(piece.r, piece.c, piece.side)
+                    new_piece = Bishop(piece.r, piece.c, piece.side)
+                    self.board[move[1][0]][move[1][1]] = new_piece
+                    self.pieces[piece.side].remove(piece)
+                    self.pieces[piece.side].append(new_piece)
                 if selection_int == 3:
-                    self.board[move[1][0]][move[1][1]] = Rook(piece.r, piece.c, piece.side)
+                    new_piece = Rook(piece.r, piece.c, piece.side)
+                    self.board[move[1][0]][move[1][1]] = new_piece
+                    self.pieces[piece.side].remove(piece)
+                    self.pieces[piece.side].append(new_piece)
                 if selection_int == 4:
-                    self.board[move[1][0]][move[1][1]] = Queen(piece.r, piece.c, piece.side)
+                    new_piece = Queen(piece.r, piece.c, piece.side)
+                    self.board[move[1][0]][move[1][1]] = new_piece
+                    self.pieces[piece.side].remove(piece)
+                    self.pieces[piece.side].append(new_piece)
 
 
     def enterMoveAuto(self, move):

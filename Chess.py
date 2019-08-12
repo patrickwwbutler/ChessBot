@@ -1,8 +1,8 @@
-from Board import Board
+import Board
 from Heuristics import *
 from Agents import *
 
-depth = 2
+depth = 3
 
 
 
@@ -10,7 +10,6 @@ def gameLoop(board, white_agent, black_agent):
     while True:
         board.display()
         move = white_agent.chooseMove(board, 'w')
-        board.enterMove(move)
         if board.isInCheck('b'):
             print('Black is in check!')
             if board.checkmate('b'):
@@ -18,7 +17,6 @@ def gameLoop(board, white_agent, black_agent):
                 break
         board.display()
         move = black_agent.chooseMove(board, 'b')
-        board.enterMove(move)
         if board.isInCheck('w'):
             print('White is in check!')
             if board.checkmate('w'):
@@ -27,7 +25,7 @@ def gameLoop(board, white_agent, black_agent):
 
 
 if __name__ == '__main__':
-    board = Board()
+    board = Board.Board()
     board.initialize()
     white_agent = None
     black_agent = None
